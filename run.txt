@@ -1,1 +1,1 @@
-pwsh -NoProfile -STA -ExecutionPolicy Bypass -File .\script.ps1 -Interactive -CheckboxUI
+pwsh -NoProfile -STA -ExecutionPolicy Bypass -File .\script.ps1 -Interactive -UI

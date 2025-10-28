@@ -19,7 +19,7 @@
 param(
     [switch]$AllUsers,        # Write to ProgramData\...\Programs (needs admin)
     [switch]$Interactive,     # Let you pick items
-    [switch]$CheckboxUI,      # Use a checkbox grid with rename support
+    [switch]$UI,              # Use an interactive UI with checkbox grid and rename support
     [switch]$Auto,            # Create for all candidates without prompt
     [switch]$Preview,         # Show what would be done, exit
     [int]$ScanLimit = 5000,   # Max EXEs to inspect during folder scan
@@ -186,7 +186,7 @@ function New-StartShortcut {
 
 # ------------------------- GUI selection (checkbox + rename) -------------------------
 
-function Select-AppsWithCheckboxUI {
+function Select-AppsWithUI {
     param(
         [Parameter(Mandatory)][object[]]$Candidates
     )
@@ -201,7 +201,7 @@ function Select-AppsWithCheckboxUI {
     # WinForms requires STA; if not STA, warn so the user can relaunch with -STA
     try {
         if ([System.Threading.Thread]::CurrentThread.ApartmentState -ne 'STA') {
-            Write-Warning 'Checkbox UI requires STA. Relaunch the script with -STA (e.g., powershell -STA -File script.ps1 -Interactive -CheckboxUI).'
+            Write-Warning 'UI requires STA. Relaunch the script with -STA (e.g., powershell -STA -File script.ps1 -Interactive -UI).'
             return $null
         }
     } catch {}
@@ -525,8 +525,8 @@ $selection = $null
 
 if ($Interactive) {
     $ogv = Get-Command Out-GridView -ErrorAction SilentlyContinue
-    if ($CheckboxUI) {
-        $selection = Select-AppsWithCheckboxUI -Candidates $candidates
+    if ($UI) {
+        $selection = Select-AppsWithUI -Candidates $candidates
     } elseif ($ogv) {
         try {
             $selection = $candidates | Select-Object Name,Exe,Source |
@@ -536,7 +536,7 @@ if ($Interactive) {
         }
     }
 
-    if (-not $selection -and -not $CheckboxUI) {
+    if (-not $selection -and -not $UI) {
         # Console fallback
         $i = 0
         $indexed = $candidates | ForEach-Object {
